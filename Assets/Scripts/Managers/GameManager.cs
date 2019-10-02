@@ -6,9 +6,26 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     private static GameManager _instance = null;
+    public GameObject[] playerObjects;
     public string[] playerNames { get; set; }  
     public float ActivePlayers { get; set; }
+    public enum GameState { mainMenu, running, paused, load, scoreboard};
 
+    public GameState gameState = GameState.mainMenu;
+
+    void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+            //DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        StartUp();
+    }
 
     public static GameManager Instance
     { //setting up static singelton reference
@@ -36,20 +53,12 @@ public class GameManager : MonoBehaviour
         {
             playerNames[i] = "Player" + Convert.ToString(i+1);
         }
+        playerObjects = new GameObject[4];
+
     }
 
-    void Awake()
+    public void AddPlayer(GameObject player, int playerNumber)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            //DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-        StartUp();
+        playerObjects[playerNumber] = player;
     }
-
 }

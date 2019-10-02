@@ -56,18 +56,24 @@ public class TogglePlayers : MonoBehaviour
             case 2:
                 {
                     player3.SetActive(false);
+                    GameManager.Instance.playerObjects[2].SetActive(false);
                     break;
                 }
             case 3:
                 {
                     player3.SetActive(true);
                     player4.SetActive(false);
+                    GameManager.Instance.playerObjects[2].SetActive(true);
+                    GameManager.Instance.playerObjects[3].SetActive(false);
                     break;
                 }
             case 4:
                 {
+
                     player3.SetActive(true);
                     player4.SetActive(true);
+                    GameManager.Instance.playerObjects[2].SetActive(true);
+                    GameManager.Instance.playerObjects[3].SetActive(true);
                     break;
                 }
             default:

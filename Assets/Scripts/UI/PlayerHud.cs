@@ -10,10 +10,7 @@ public class PlayerHud : MonoBehaviour
 
     private void TrackHudPosition()
     {   //tracks each players Hud to the ships position.
-
-        Vector2 hudPos = Camera.main.WorldToScreenPoint(transform.position);
-        playerHud.position = hudPos;
-        //TODO this needs testing
+        playerHud.position = transform.position;
     }
 
     void Update()

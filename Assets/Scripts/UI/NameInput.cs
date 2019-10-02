@@ -6,11 +6,11 @@ using UnityEngine.UI;
 public class NameInput : MonoBehaviour
 {
     [SerializeField]
-    private Text playerName;
+    private Text _playerName;
 
     public void OnEndEdit()
     {   //Find the written text and update the playerName.
         string temp = GetComponent<InputField>().text;
-        playerName.text = temp;
+        _playerName.text = temp;
     }
 }
