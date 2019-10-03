@@ -10,21 +10,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int index;
     [SerializeField]
-    private TrailCollision trail;
+    private CircleCollider2D hitBox;
+
 
     private void Start()
     {
+        hitBox = GetComponent<CircleCollider2D>();
         GameManager.Instance.AddPlayer(gameObject, index);  // need centralized references to the players since they are in different scenes you cant just drag them in the inspector.
         if (index == 2 || index == 3) gameObject.SetActive(false); //start wont trigger if the object isnt active, another solution would be to spawn from prefabs.
-        StartCoroutine(UpdateTrail());
-    }
-
-    private IEnumerator UpdateTrail()
-    {
-        Vector2 currentPoint = transform.position;
-        yield return new WaitForSecondsRealtime(0.05f);
-        trail.AddPoint(currentPoint);
-        StartCoroutine(UpdateTrail());
+        PlayerName = GameManager.Instance.playerNames[index];
     }
 
     private void Update()
@@ -69,8 +63,13 @@ public class Player : MonoBehaviour
         transform.position += transform.right * Time.deltaTime * xMoveSpeed;
     }
 
-    private void CheckCollision()
-    {   
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log(PlayerName +"Crashed with "+ collision.gameObject.name);
+        collision.gameObject.GetComponent<TrailCollision>().SplitTrail(transform);
+        hitBox.enabled = false;
+        GetComponent<TrailHandler>().TrailCut(false);
+        //Destroy(collision.gameObject);
 
     }
 
