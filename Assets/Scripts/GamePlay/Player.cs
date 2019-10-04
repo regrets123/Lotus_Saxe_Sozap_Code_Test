@@ -66,7 +66,7 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(PlayerName +"Crashed with "+ collision.gameObject.name);
-        collision.gameObject.GetComponent<TrailCollision>().SplitTrail(transform);
+        collision.gameObject.GetComponent<TrailCollision>().SplitPoint(transform);
         hitBox.enabled = false;
         GetComponent<TrailHandler>().TrailCut(false);
         //Destroy(collision.gameObject);

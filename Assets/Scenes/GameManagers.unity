@@ -164,3 +164,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23acec07a3ecef14d8e39197e3d31d65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerObjects: []
+  gameState: 0
