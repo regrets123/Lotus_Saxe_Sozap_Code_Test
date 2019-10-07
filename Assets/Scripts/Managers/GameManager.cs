@@ -8,7 +8,10 @@ public class GameManager : MonoBehaviour
     private static GameManager _instance = null;
     public GameObject[] playerObjects;
     public string[] playerNames { get; set; }  
-    public float ActivePlayers { get; set; }
+    public int ActivePlayers { get; set; }
+    public RoundsManager roundsManager;
+
+    public int round;
     public enum GameState { mainMenu, running, paused, load, scoreboard};
 
     public GameState gameState = GameState.mainMenu;
@@ -39,7 +42,7 @@ public class GameManager : MonoBehaviour
                     //instanziating new one.
                     GameObject gameManager = new GameObject();
                     _instance = gameManager.AddComponent<GameManager>();
-                    //DontDestroyOnLoad(gameManager); //TODO remove this because Id rather use asynchronous loading to keep the loading off mainthread.
+    
                 }
             }
             return _instance;
@@ -55,7 +58,9 @@ public class GameManager : MonoBehaviour
         }
         playerObjects = new GameObject[4];
 
+        ActivePlayers = 2;
     }
+
 
     public void AddPlayer(GameObject player, int playerNumber)
     {

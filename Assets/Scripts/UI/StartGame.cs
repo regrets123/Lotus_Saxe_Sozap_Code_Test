@@ -11,13 +11,12 @@ public class StartGame : MonoBehaviour
 
     public void StarTheGame()
     {   //Makes a new array matching the size of current active players.
-        string[] playersInGame = new string[Convert.ToInt16(GameManager.Instance.ActivePlayers)];
+        string[] playersInGame = new string[GameManager.Instance.ActivePlayers];
         for (int i = 0; i < playersInGame.Length; i++)
         {
            playersInGame[i] = _playerNames[i].text;
         }
         GameManager.Instance.playerNames = playersInGame;   //Then we update the list at gameManager. 
-        //TODO initialize sceneload and game stuff.
-        
+        StartCoroutine(GameManager.Instance.roundsManager.StartCountdown());        
     }
 }

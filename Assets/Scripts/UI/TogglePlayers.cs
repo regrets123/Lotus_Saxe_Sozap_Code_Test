@@ -22,7 +22,7 @@ public class TogglePlayers : MonoBehaviour
     public void OnClick()
     {   //TODO save the addition or subtraction to a gamestate script aswell for initialization of game. 
 
-        float _currentAmount = float.Parse(_numberOfPlayers.text);  //saving as float for math.
+        int _currentAmount = int.Parse(_numberOfPlayers.text);  //saving as float for math.
         if (_additive)
         {
             //need to check size of current players.
