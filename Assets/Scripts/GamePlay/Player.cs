@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     public string PlayerName { get; set; }
+    public float NewScore { get; set; }
     public float Score { get; set; }
+    public bool Alive { get; set; }
     [SerializeField]
     private int index;
     [SerializeField]
-    private Transform playerHud;
+    private Transform playerHud, startPos;
     private float attackCooldown = 4;
     private float phaseOutCooldown = 6;
 
@@ -30,10 +32,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-
         Move();    //check playerinput.
         TrackHudPosition();
-     
     }
 
     public void ToggleHud(bool toggleState)
@@ -47,12 +47,37 @@ public class Player : MonoBehaviour
     private void Attack()
     {
         Debug.Log("Pewpew shooting sadface!");
+
+        //add points to score, not new score.
         //Needs Cooldown, projectile, path (vector2),
     }
 
-    private void Die()
+    private void Death()
     {
-        //Killer? need to check example game, multiplayer death?
+        gameObject.SetActive(false);
+        ToggleHud(false);
+        GetComponent<TrailHandler>().TrailCut(false);
+        Alive = false;
+        GameManager.Instance.CheckWin = true;
+        
+    }
+
+    public void ResetPlayer(bool keepScore)
+    {   //reset stats for next round/game.
+
+        if(!keepScore)
+        {
+            Score = 0;
+            NewScore = 0;
+        }
+        else
+        {
+            Score = NewScore;
+        }
+        gameObject.transform.position = startPos.position;
+        Alive = true;        
+        attackCooldown = 4;
+        phaseOutCooldown = 6;
     }
 
     private IEnumerator Invulnerability()
@@ -109,17 +134,16 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
-    {
+    {   //Checks collision between ships and different objects. In the test example, it doesnt check collision vs other ships, so it feels random who gets hit by the enemy tail first. If ships go exactly straight into and die at the same time, the test game gets stuck.
+        //TODO Solution, kill both players, then matches can end in draw and no one should get points? Both Death method needs to resolve befor win check, else the player with first index wins. Buffer them? Or delay?       
+        
         Debug.Log(PlayerName +"Crashed with "+ collision.gameObject.name);
-        collision.gameObject.GetComponent<TrailCollision>().SplitPoint(transform);
-        gameObject.SetActive(false);
-        ToggleHud(false);
-        GetComponent<TrailHandler>().TrailCut(false);
-        //Destroy(collision.gameObject);
+        if(collision.gameObject.tag == "Tails")
+        { collision.gameObject.GetComponent<TrailCollision>().SplitPoint(transform); }
+        Death();
 
     }
 

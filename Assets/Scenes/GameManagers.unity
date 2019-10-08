@@ -165,4 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerObjects: []
+  roundsManager: {fileID: 0}
+  CheckWin: 0
+  round: 0
   gameState: 0
