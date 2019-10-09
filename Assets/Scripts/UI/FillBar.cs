@@ -13,17 +13,21 @@ public class FillBar : MonoBehaviour
     private float time = 0;
     private float fillspeed = 1;
 
-    public void AnimateBar()
-    {
-        _image.fillAmount = Mathf.Lerp(StartValue, EndValue, time);
-        time += fillspeed * Time.deltaTime;
-        if (_image.fillAmount == EndValue) StartFilling = false;
-    }
+    public IEnumerator AnimateBar(float intervall, float currentFill)
+    {   //calls on itself with intervals until the bar is filled. This way we avoid having a constant check in update for bools if I used a Lerp method instead.
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (StartFilling)
-            AnimateBar();
+        if (currentFill > EndValue)
+        {
+            if(EndValue > 149.9)
+            GameManager.Instance.roundsManager.StartCeleb();
+            yield return null;
+        }
+        else
+        {
+            yield return new WaitForSeconds(intervall);
+            currentFill += 0.2f;
+            _image.fillAmount = currentFill / 150;
+            StartCoroutine(AnimateBar(time, currentFill));
+        }
     }
 }

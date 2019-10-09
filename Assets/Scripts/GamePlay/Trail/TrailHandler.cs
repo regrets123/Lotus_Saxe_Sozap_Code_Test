@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TrailHandler : MonoBehaviour
-{   //handles switching between mesh collider finished spawen trails and live trails still spawning behind players. 
+{   //handles switching between finished spawen trails and live trails still spawning behind players. 
 
     public GameObject trailPrefab, collisionPrefab, trailMeshPrefab;
     [SerializeField]
@@ -12,15 +12,25 @@ public class TrailHandler : MonoBehaviour
     public Player player { get; set; }
     public Mesh tempMesh;
 
-    private void Start()
-    {
+    public void AssignTrailColor(Player player)
+    {  //saving the gradient for new trails
+        _color = player.TrailGradient;
+    }
+
+    public void RestartTrail()
+    {   //makes sure all references are set b4 next game 
+
         if (_trail.TrailRenderer == null)
         { _trail.TrailRenderer = transform.GetChild(1).GetComponent<TrailRenderer>(); };
-        player = GetComponent<Player>();  //saving the gradient for new trails.
-        _color = transform.GetChild(1).GetComponent<TrailRenderer>().colorGradient;
+
+    }
+
+    public void StartSpawning()
+    {   //call upon gamestart to time spawning with trail generation properly after countdown.
         StartCoroutine(StartDelay());
         StartCoroutine(TrailCut(true));
     }
+
     private IEnumerator StartDelay()
     {
         yield return new WaitForSeconds(0.02f);
@@ -35,7 +45,7 @@ public class TrailHandler : MonoBehaviour
 
     public IEnumerator TrailCut(bool recursive)
     {   //faking a "cut" in the trail by creating a new trail and stopping the other trail.
-        //TODO add a breakcondition in each of these methods so they dont continue when they shouldnt, aka end of player or end of game.
+
         float trailLength;
 
         if (recursive)
@@ -56,19 +66,23 @@ public class TrailHandler : MonoBehaviour
 
     public IEnumerator NewTrail(Transform trailParent, Transform collisionParent)
     {   //instanziates new trail and trail collider, setting colors and parents.
+        if(GameManager.Instance.gameState == GameManager.GameState.running)
+        {
+            yield return new WaitForSecondsRealtime(0.5f);
+            GameObject newTrail = Instantiate(trailPrefab, trailParent);
+            GameObject newColliders = Instantiate(collisionPrefab, collisionParent);
+            newTrail.GetComponent<TrailRenderer>().colorGradient = _color;
+            _trail = newColliders.GetComponent<TrailCollision>();
+            _trail.Expanding = true;
+            _trail.TrailRenderer = transform.GetChild(1).GetComponent<TrailRenderer>();
+            _trail.TrailRenderer.emitting = false;  //need to pause emitting to match the first collider position.
+            _trail.StaticTrails = collisionParent.parent.GetChild(0).transform;
 
-        yield return new WaitForSecondsRealtime(0.5f);
-        GameObject newTrail = Instantiate(trailPrefab, trailParent);
-        GameObject newColliders = Instantiate(collisionPrefab, collisionParent);
-        newTrail.GetComponent<TrailRenderer>().colorGradient = _color;
-        _trail = newColliders.GetComponent<TrailCollision>();
-        _trail.Expanding = true;
-        _trail.TrailRenderer = transform.GetChild(1).GetComponent<TrailRenderer>();
-        _trail.TrailRenderer.emitting = false;  //need to pause emitting to match the first collider position.
-        _trail.StaticTrails = collisionParent.parent.GetChild(0).transform;
+            StartCoroutine(NewEdgeCollider());  //start new trailCollider generation
+            StartCoroutine(TrailCut(true));      //And queues next cut.
+        }
+        else { yield return null; }
 
-        StartCoroutine(NewEdgeCollider());  //start new trailCollider generation
-        StartCoroutine(TrailCut(true));      //And queues next cut.
     }
 
     public void NewTrailFromArr(Vector2[] newPositions)
@@ -81,21 +95,26 @@ public class TrailHandler : MonoBehaviour
 
     private IEnumerator NewEdgeCollider()
     {   //We need an extra delay on the collider to avoid crashing into it as we move forward.
-        yield return new WaitForSeconds(0.1f);
-        _trail.TrailRenderer.emitting = true;
-        StartCoroutine(UpdateTrail());
+        if(GameManager.Instance.gameState == GameManager.GameState.running)
+        {
+            yield return new WaitForSeconds(0.1f);
+            _trail.TrailRenderer.emitting = true;
+            StartCoroutine(UpdateTrail());
+        }
+        else { yield return null; };
     }
 
     private IEnumerator UpdateTrail()
     {  //Recuring method calls on itself to keep updating a earlier position to keep the trail growing behind the player.
-        if (_trail.Expanding)
+        if (_trail.Expanding && GameManager.Instance.gameState == GameManager.GameState.running)
         {
             Vector2 currentPoint = transform.position;
             yield return new WaitForSeconds(0.03f);
             _trail.AddPoint(currentPoint);
             StartCoroutine(UpdateTrail());
         }
-        yield return null;
+        else { yield return null; };
+        
     }
 
     private IEnumerator DelayUpdate(float delay)

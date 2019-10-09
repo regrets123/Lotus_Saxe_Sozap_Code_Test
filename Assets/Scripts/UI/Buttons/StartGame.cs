@@ -8,15 +8,16 @@ public class StartGame : MonoBehaviour
 {
     [SerializeField]
     private Text [] _playerNames = new Text[4];
+    [SerializeField]
+    private Text numberOfPlayer;
 
     public void StarTheGame()
-    {   //Makes a new array matching the size of current active players.
-        string[] playersInGame = new string[GameManager.Instance.ActivePlayers];
-        for (int i = 0; i < playersInGame.Length; i++)
+    {   //takes the updated names from UI elements and assigns them to the Player Scripts.
+        GameManager.Instance.ActivePlayers = Convert.ToInt16(numberOfPlayer.text);
+        for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
         {
-           playersInGame[i] = _playerNames[i].text;
+            GameManager.Instance.playerObjects[i].GetComponent<Player>().PlayerName = _playerNames[i].text;
         }
-        GameManager.Instance.playerNames = playersInGame;   //Then we update the list at gameManager. 
         StartCoroutine(GameManager.Instance.roundsManager.StartCountdown());        
     }
 }

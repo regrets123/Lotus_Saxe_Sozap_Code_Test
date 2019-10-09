@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class RoundsManager : MonoBehaviour
-{   //Handles logic loop between each round and triggers animations.
+{   //Handles UI, logic between each round and triggers animations.
 
 
     [SerializeField]
@@ -35,14 +35,19 @@ public class RoundsManager : MonoBehaviour
             textAnimator.GetComponent<Text>().text = "First to 150p Wins";
         }
         else
-        {
+        {   //updates countdown text and removes old tails
             textAnimator.GetComponent<Text>().text = ("Round " + _roundsCount);
+            ClearGameField();
+
         }
         textAnimator.GetComponent<Animator>().SetTrigger("Start");
 
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
         {
-            GameManager.Instance.playerObjects[i].GetComponent<Player>().ToggleHud(true);
+            Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
+            if (_roundsCount > 1)
+            { temp.ResetPlayer(true); } 
+            temp.ToggleHud(true);
         }
         yield return new WaitForSeconds(5.5f);
         StartGame();
@@ -58,6 +63,7 @@ public class RoundsManager : MonoBehaviour
         { resetScore = false; }
 
         _counter.enabled = false;
+        _roundsResults.enabled = false;
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++) //Ressurect all players from previous rounds, and reset score and positions.
         {
             Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
@@ -68,10 +74,10 @@ public class RoundsManager : MonoBehaviour
     }
 
     public void PostRound()
-    {   //Sorts ranking and keeps track of which round we at.
+    {   //Sorts ranking and keeps track of which round we at, resets playerstates.
 
         _roundsCount++;
-        _roundsResults.enabled = true;
+        _roundsResults.enabled = true;       
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = "Next Round";
 
         List <GameObject> tempList = new List <GameObject>();
@@ -81,7 +87,7 @@ public class RoundsManager : MonoBehaviour
             tempList.Add(player);
             transform.GetChild(0).GetChild(0).GetChild(i).gameObject.SetActive(true);
         }
-        var sortedList = tempList.OrderByDescending(x => x.GetComponent<Player>().Score).ToList();
+        var sortedList = tempList.OrderByDescending(x => x.GetComponent<Player>().NewScore).ToList();
         
         for (int i = 0; i < sortedList.Count; i++)
         {
@@ -93,7 +99,7 @@ public class RoundsManager : MonoBehaviour
     {   //Updates Scoreboard Ui Elements, backgroundcolor 
 
         Transform uiElement = transform.GetChild(0).GetChild(0).GetChild(index);
-        Color playerColor = playerData.transform.GetChild(1).GetComponent<TrailRenderer>().colorGradient.colorKeys[0].color;
+        Color playerColor = playerData.TrailColor;
         for (int i = 0; i < 2; i++)
         {
             if(i == 0)
@@ -110,21 +116,35 @@ public class RoundsManager : MonoBehaviour
         uiElement.GetChild(2).GetComponent<Text>().text = playerData.PlayerName;
         uiElement.GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.NewScore);
 
-        _fillBars[index].StartValue = playerData.Score;
-        _fillBars[index].EndValue = playerData.NewScore;
-        StartCoroutine(FillDelay(index));
+        if(playerData.Score != playerData.NewScore)
+        {   //if score has changed between the rounds, we trigger animation coroutine for that, using data from the Decending list into fillbar index.
+            _fillBars[index].StartValue = playerData.Score;
+            _fillBars[index].EndValue = playerData.NewScore;
+            StartCoroutine(FillDelay(index));
+        }
     }
 
     private IEnumerator FillDelay(int index)
     {
-        yield return new WaitForSeconds(0.25f);
-        _fillBars[index].StartFilling = true;
+        yield return new WaitForSeconds(1f);
+        StartCoroutine(_fillBars[index].AnimateBar(0.1f, _fillBars[index].StartValue));
     }
 
-    private void StartCeleb()
+    public void StartCeleb()
     {   //TODO Trigger animations of playerUiElement and fireworks etc.
 
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = "Menu";
+    }
+
+    public void NextRound()
+    {   //triggers on next round button when u finished at scoreboard
+        StartCoroutine(StartCountdown());
+    }
+
+    private void ClearGameField()
+    {
+        //Remove all old tails
+
     }
 
     public void ReturnToMain()

@@ -29,13 +29,8 @@ public class TrailCollision : MonoBehaviour
         if (Expanding)
         {
             _pointHolder.Add(vector);
-            if (_pointHolder.Count % 2 == 0)   //if we make sure the actual collider array is uneven, we can make a symetrical split matching the "hole" collision point.
+            if (_pointHolder.Count % 2 != 0)   //if we make sure the actual collider array is uneven, we can make a symetrical split matching the "hole" collision point.
             {
-                //Debug.Log("The list of positions is " + _pointHolder.Count + " elements long. This number is even, so we dont add yet.");
-            }
-            else
-            {
-                //Debug.Log("The list of positions is " + _pointHolder.Count + " elements long. This number is uneven, so we add it to collider.");
                 Vector2[] newPoints = new Vector2[_pointHolder.Count];
                 for (int i = 0; i < newPoints.Length; i++)
                 {
@@ -47,55 +42,26 @@ public class TrailCollision : MonoBehaviour
         }
     }
 
+    public void SplitPoint(Transform collidingPlayer)
+    {   //we gonna find the closest collision point, find the closest position on the trailCollider, then split at that index.
 
-    private void SplitGardientTrail(float firstIndex, float secondIndex, float fullTrail)
-    {
-        //since gradient is from 0 to 1 on timescale, we need to divide index by total arrayLenght.
-        float firstAlphaKeyTime = 1 - (firstIndex / fullTrail); //time seems reversed on gradient so i have to subtract from 1.
-        float secondAlphaKeyTime = 1 - (secondIndex / fullTrail);
+        Vector2 compareMe = collidingPlayer.position;
+        Vector2 breakPoint = _collider2D.ClosestPoint(compareMe);
+        TrailHandler handler = collidingPlayer.GetComponent<TrailHandler>();
+        float distance = Mathf.Infinity;
+        int splitPoint = 999;
 
-        AnimationCurve trailWidth = new AnimationCurve();
-        Keyframe firstKey = new Keyframe(firstAlphaKeyTime, 0, 0, 0);
-        Keyframe secondKey = new Keyframe(firstAlphaKeyTime  +0.001f, 0.16f, 0, 0);
-        Keyframe thirdKey = new Keyframe(secondAlphaKeyTime - 0.001f, 0.16f, 0, 0);
-        Keyframe fourthKey = new Keyframe(secondAlphaKeyTime , 0, 0, 0);
-        trailWidth.AddKey(firstKey);
-        trailWidth.AddKey(secondKey);
-        trailWidth.AddKey(thirdKey);
-        trailWidth.AddKey(fourthKey);
-        TrailRenderer.widthCurve = trailWidth;
-
-    }
-
-    private void SplitGardientTrail(float firstIndex, float fullTrail,bool atStart)
-    {
-        float firstAlphaKeyTime = (firstIndex / fullTrail); //time seems reversed on gradient so i have to subtract from 1.
-
-        AnimationCurve trailWidth = new AnimationCurve();
-        if(atStart)
+        for (int i = 0; i < _collider2D.points.Length; i++)
         {
-            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
-            Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
-            Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
-            Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
-            trailWidth.AddKey(firstKey);
-            trailWidth.AddKey(secondKey);
-            trailWidth.AddKey(thirdKey);
-            trailWidth.AddKey(fourthKey);
-            TrailRenderer.widthCurve = trailWidth;
+            float tempdistance = Vector2.Distance(_collider2D.points[i], breakPoint);
+            if (tempdistance < distance)
+            {
+                distance = tempdistance;
+                splitPoint = (i);
+            }
         }
-        else
-        {
-            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
-            Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
-            Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
-            Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
-            trailWidth.AddKey(firstKey);
-            trailWidth.AddKey(secondKey);
-            trailWidth.AddKey(thirdKey);
-            trailWidth.AddKey(fourthKey);
-            TrailRenderer.widthCurve = trailWidth;
-        }       
+        Debug.Log("splitpoint is at index:" + splitPoint);
+        SplitCollider(handler, splitPoint);
 
     }
 
@@ -143,27 +109,53 @@ public class TrailCollision : MonoBehaviour
         }
     }
 
-    public void SplitPoint(Transform collidingPlayer)
-    {   //we gonna find the closest collision point, find the closest position on the trailCollider, then split at that index.
-        Vector2 compareMe = collidingPlayer.position;
-        Vector2 breakPoint = _collider2D.ClosestPoint(compareMe);
-        TrailHandler handler = collidingPlayer.GetComponent<TrailHandler>();
-        float distance = Mathf.Infinity;
-        int splitPoint = 999;
+    private void SplitGardientTrail(float firstIndex, float secondIndex, float fullTrail)
+    {    //since gradient is from 0 to 1 on timescale, we need to divide index by total arrayLenght.
 
-        for (int i = 0; i < _collider2D.points.Length; i++)
-        {
-            float tempdistance = Vector2.Distance(_collider2D.points[i], breakPoint);
-            if (tempdistance < distance)
-            {
-                distance = tempdistance;
-                splitPoint = (i);
-            }
-        }
-        Debug.Log("splitpoint is at index:" + splitPoint);
-        SplitCollider(handler, splitPoint);
+        float firstAlphaKeyTime = 1 - (firstIndex / fullTrail); //time seems reversed on gradient so we have to subtract from 1.
+        float secondAlphaKeyTime = 1 - (secondIndex / fullTrail);
+
+        AnimationCurve trailWidth = new AnimationCurve();
+        Keyframe firstKey = new Keyframe(firstAlphaKeyTime, 0, 0, 0);
+        Keyframe secondKey = new Keyframe(firstAlphaKeyTime + 0.001f, 0.16f, 0, 0);
+        Keyframe thirdKey = new Keyframe(secondAlphaKeyTime - 0.001f, 0.16f, 0, 0);
+        Keyframe fourthKey = new Keyframe(secondAlphaKeyTime, 0, 0, 0);
+        trailWidth.AddKey(firstKey);
+        trailWidth.AddKey(secondKey);
+        trailWidth.AddKey(thirdKey);
+        trailWidth.AddKey(fourthKey);
+        TrailRenderer.widthCurve = trailWidth;
 
     }
 
+    private void SplitGardientTrail(float firstIndex, float fullTrail, bool atStart)
+    {   //here we cut from start or end depending on where we collide, thus different positions on the gradient.
 
+        float firstAlphaKeyTime = (firstIndex / fullTrail);
+        AnimationCurve trailWidth = new AnimationCurve();
+        if (atStart)
+        {
+            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
+            Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
+            Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
+            Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
+            trailWidth.AddKey(firstKey);
+            trailWidth.AddKey(secondKey);
+            trailWidth.AddKey(thirdKey);
+            trailWidth.AddKey(fourthKey);
+            TrailRenderer.widthCurve = trailWidth;
+        }
+        else
+        {
+            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
+            Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
+            Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
+            Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
+            trailWidth.AddKey(firstKey);
+            trailWidth.AddKey(secondKey);
+            trailWidth.AddKey(thirdKey);
+            trailWidth.AddKey(fourthKey);
+            TrailRenderer.widthCurve = trailWidth;
+        }
+    }
 }

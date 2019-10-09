@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     public float NewScore { get; set; }
     public float Score { get; set; }
     public bool Alive { get; set; }
+    public Color TrailColor { get; set; }
+    public Gradient TrailGradient { get; set; }
     [SerializeField]
     private int index;
     [SerializeField]
@@ -22,12 +24,14 @@ public class Player : MonoBehaviour
         playerHud.position = transform.position;
     }
 
-
     private void Start()
     {
         GameManager.Instance.AddPlayer(gameObject, index);  // need centralized references to the players since they are in different scenes you cant just drag them in the inspector.
+        TrailColor = transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().color;
+        TrailGradient = transform.GetChild(1).GetComponent<TrailRenderer>().colorGradient;
+        gameObject.GetComponent<TrailHandler>().AssignTrailColor(this);
         if (index == 2 || index == 3) gameObject.SetActive(false); //start wont trigger if the object isnt active, another solution would be to spawn from prefabs.
-        PlayerName = GameManager.Instance.playerNames[index];
+
     }
 
     private void Update()
@@ -63,7 +67,7 @@ public class Player : MonoBehaviour
     }
 
     public void ResetPlayer(bool keepScore)
-    {   //reset stats for next round/game.
+    {   //reset stats for next round/game, right b4 game starts.
 
         if(!keepScore)
         {
@@ -75,9 +79,12 @@ public class Player : MonoBehaviour
             Score = NewScore;
         }
         gameObject.transform.position = startPos.position;
+        gameObject.SetActive(true);
         Alive = true;        
         attackCooldown = 4;
         phaseOutCooldown = 6;
+        gameObject.GetComponent<TrailHandler>().RestartTrail();
+        gameObject.GetComponent<TrailHandler>().StartSpawning();
     }
 
     private IEnumerator Invulnerability()
@@ -97,41 +104,27 @@ public class Player : MonoBehaviour
             if (Input.GetAxisRaw("Horizontal") != 0)  //this should work with gamepad and joysticks aswell.
             {
                 if (Input.GetAxisRaw("Horizontal") < 0.1)
-                {
-                    transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
-                }
+                { transform.Rotate(0, 0, rotationSpeed * Time.deltaTime); }
                 else
-                {
-                    transform.Rotate(0, 0, -(rotationSpeed * Time.deltaTime));
-                }
+                { transform.Rotate(0, 0, -(rotationSpeed * Time.deltaTime)); }
             }
             transform.position += transform.right * Time.deltaTime * xMoveSpeed;
-
             if (Input.GetAxisRaw("Vertical") != 0) 
             {
                 if (Input.GetAxisRaw("Horizontal") < 0.01)
-                {
-                    Attack();
-                }
+                { Attack(); }
                 else
-                {
-                    StartCoroutine(Invulnerability());
-                }
+                { StartCoroutine(Invulnerability()); }
             };
-
         }
         else if(GameManager.Instance.gameState == GameManager.GameState.load)
         {
             if (Input.GetAxisRaw("Horizontal") != 0)  //this should work with gamepad and joysticks aswell.
             {
                 if (Input.GetAxisRaw("Horizontal") < 0.01)
-                {
-                    transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
-                }
+                { transform.Rotate(0, 0, rotationSpeed * Time.deltaTime); }
                 else
-                {
-                    transform.Rotate(0, 0, -(rotationSpeed * Time.deltaTime));
-                }
+                { transform.Rotate(0, 0, -(rotationSpeed * Time.deltaTime)); }
             }
         }
     }
@@ -143,6 +136,7 @@ public class Player : MonoBehaviour
         Debug.Log(PlayerName +"Crashed with "+ collision.gameObject.name);
         if(collision.gameObject.tag == "Tails")
         { collision.gameObject.GetComponent<TrailCollision>().SplitPoint(transform); }
+        collision.gameObject.SetActive(false);
         Death();
 
     }

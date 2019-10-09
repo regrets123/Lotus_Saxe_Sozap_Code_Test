@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour
 
     private static GameManager _instance = null;
     public GameObject[] playerObjects;
-    public string[] playerNames { get; set; }  
     public int ActivePlayers { get; set; }
     public RoundsManager roundsManager;
     public bool CheckWin = false;
@@ -35,7 +34,6 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        StartUp();
     }
 
     private void LateUpdate()
@@ -65,17 +63,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void StartUp()
-    {   //sets up the array for default names.
-        playerNames = new string[4];
-        for (int i = 0; i < playerNames.Length; i++)
-        {
-            playerNames[i] = "Player" + Convert.ToString(i+1);
-        }
-        playerObjects = new GameObject[4];
-        ActivePlayers = 2;
-    }
-
     public void WinConditionCheck()
     {   //called upon player death. If it finds game over we trigger Scoreboard.
         int remainingPlayers = 0;
@@ -93,6 +80,7 @@ public class GameManager : MonoBehaviour
             {
                 if (playerObjects[i].activeSelf) // we give that player 30 points, then end the round.
                 {
+                    playerObjects[i].SetActive(false); //so it cant double trigger.
                     playerObjects[i].GetComponent<Player>().NewScore += 30f;
                 }
             }
@@ -104,6 +92,10 @@ public class GameManager : MonoBehaviour
 
     public void AddPlayer(GameObject player, int playerNumber)
     {
+        if(playerObjects.Length <1)
+        {
+            playerObjects = new GameObject[4];
+        }
         playerObjects[playerNumber] = player;
     }
 }
