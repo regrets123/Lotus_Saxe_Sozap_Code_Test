@@ -12,12 +12,14 @@ public class GameManager : MonoBehaviour
     public GameObject[] playerObjects;
     public int ActivePlayers { get; set; }
     public RoundsManager roundsManager;
+    public TrailCleaner cleaner;
     public bool CheckWin = false;
 
     public int round;
     public enum GameState { mainMenu, running, paused, load, scoreboard};
 
     public GameState gameState = GameState.mainMenu;
+    
 
     private void Update()
     {
@@ -78,9 +80,9 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < ActivePlayers; i++)
             {
-                if (playerObjects[i].activeSelf) // we give that player 30 points, then end the round.
+                if (playerObjects[i].GetComponent<Player>().Alive) // we give that player 30 points, then end the round.
                 {
-                    playerObjects[i].SetActive(false); //so it cant double trigger.
+                    playerObjects[i].GetComponent<Player>().Alive = false; //so it cant double trigger.
                     playerObjects[i].GetComponent<Player>().NewScore += 30f;
                 }
             }

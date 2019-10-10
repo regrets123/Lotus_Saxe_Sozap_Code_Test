@@ -5,30 +5,21 @@ using UnityEngine;
 public class TrailHandler : MonoBehaviour
 {   //handles switching between finished spawen trails and live trails still spawning behind players. 
 
-    public GameObject trailPrefab, collisionPrefab, trailMeshPrefab;
+    public GameObject trailPrefab, collisionPrefab;
     [SerializeField]
     private TrailCollision _trail;
-    private Gradient _color;
+    private Color _color;
     public Player player { get; set; }
-    public Mesh tempMesh;
 
     public void AssignTrailColor(Player player)
     {  //saving the gradient for new trails
-        _color = player.TrailGradient;
-    }
-
-    public void RestartTrail()
-    {   //makes sure all references are set b4 next game 
-
-        if (_trail.TrailRenderer == null)
-        { _trail.TrailRenderer = transform.GetChild(1).GetComponent<TrailRenderer>(); };
-
+        _color = player.TrailColor;
     }
 
     public void StartSpawning()
     {   //call upon gamestart to time spawning with trail generation properly after countdown.
         StartCoroutine(StartDelay());
-        StartCoroutine(TrailCut(true));
+        NewTrail(transform,GameManager.Instance.cleaner.transform.GetChild(1));
     }
 
     private IEnumerator StartDelay()
@@ -37,53 +28,58 @@ public class TrailHandler : MonoBehaviour
         StartCoroutine(UpdateTrail());
     }
 
-    private IEnumerator StopEmitting(float time)
-    {   //Modifying method to match end of trail to match colliders.
-        yield return new WaitForSeconds(time -0.01f);
-        transform.GetChild(1).GetComponent<TrailRenderer>().emitting = false;
+    private IEnumerator NextTrailDelay(Transform transform)
+    {
+        yield return new WaitForSeconds(1f);
+        NewTrail(transform, transform);
     }
 
-    public IEnumerator TrailCut(bool recursive)
+    public IEnumerator TrailCut()
     {   //faking a "cut" in the trail by creating a new trail and stopping the other trail.
 
         float trailLength;
 
-        if (recursive)
-        { trailLength = Random.Range(3, 5); }
-        else
-        { trailLength = 0; }       
-        StartCoroutine(StopEmitting(trailLength));
+        //if (recursive)
+        trailLength = Random.Range(3, 5); 
+        //else
+        //{ trailLength = 0; }
+        ////StartCoroutine(StopEmitting(trailLength));
+        //transform.GetChild(1).GetComponent<TrailRenderer>().emitting = false;
 
         yield return new WaitForSeconds(trailLength);
         _trail.Expanding = false;
-        Transform staticTrails = _trail.transform.parent.parent.GetChild(0); //moving them to a empty object to keep them sorted.
-        _trail.gameObject.transform.SetParent(staticTrails);
-        transform.GetChild(1).transform.SetParent(staticTrails);
+        UpdateTrailParents();
+        
+        if(GameManager.Instance.gameState == GameManager.GameState.running)
+            StartCoroutine(NextTrailDelay(GameManager.Instance.cleaner.transform.GetChild(0)));
 
-        if (recursive)
-        StartCoroutine(NewTrail(transform, staticTrails.parent.GetChild(1)));
     }
 
-    public IEnumerator NewTrail(Transform trailParent, Transform collisionParent)
+    private void UpdateTrailParents()
+    {   //moving them to a empty object to keep the trails sorted for removing after round.
+        Transform staticTrails = GameManager.Instance.cleaner.transform.GetChild(0); 
+        _trail.gameObject.transform.SetParent(staticTrails);
+        transform.GetChild(1).transform.SetParent(staticTrails);
+    }
+
+    public void NewTrail(Transform trailParent, Transform collisionParent)
     {   //instanziates new trail and trail collider, setting colors and parents.
         if(GameManager.Instance.gameState == GameManager.GameState.running)
         {
-            yield return new WaitForSecondsRealtime(0.5f);
-            GameObject newTrail = Instantiate(trailPrefab, trailParent);
+            GameObject newTrail = Instantiate(trailPrefab, transform);
             GameObject newColliders = Instantiate(collisionPrefab, collisionParent);
-            newTrail.GetComponent<TrailRenderer>().colorGradient = _color;
+            newTrail.GetComponent<TrailRenderer>().startColor = _color;
+            newTrail.GetComponent<TrailRenderer>().endColor = _color;
             _trail = newColliders.GetComponent<TrailCollision>();
-            _trail.Expanding = true;
-            _trail.TrailRenderer = transform.GetChild(1).GetComponent<TrailRenderer>();
-            _trail.TrailRenderer.emitting = false;  //need to pause emitting to match the first collider position.
+            _trail.TrailRenderer = newTrail.GetComponent<TrailRenderer>();
             _trail.StaticTrails = collisionParent.parent.GetChild(0).transform;
-
+            _trail.Expanding = true;
+            _trail.TrailRenderer.emitting = true;
             StartCoroutine(NewEdgeCollider());  //start new trailCollider generation
-            StartCoroutine(TrailCut(true));      //And queues next cut.
+            StartCoroutine(TrailCut());      //And queues next cut.
         }
-        else { yield return null; }
-
     }
+
 
     public void NewTrailFromArr(Vector2[] newPositions)
     {   //here we instantiate new edgecollider from the array.
@@ -117,9 +113,4 @@ public class TrailHandler : MonoBehaviour
         
     }
 
-    private IEnumerator DelayUpdate(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        StartCoroutine(UpdateTrail());      
-    }
 }

@@ -506,6 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 165704714}
+  Winner: {fileID: 765398908}
 --- !u!1 &196797326
 GameObject:
   m_ObjectHideFlags: 0
@@ -2025,6 +2026,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 550839793}
+  Winner: {fileID: 1476994953}
 --- !u!1 &554547945
 GameObject:
   m_ObjectHideFlags: 0
@@ -3172,6 +3174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 792130545}
+  Winner: {fileID: 196797326}
 --- !u!1 &795461487
 GameObject:
   m_ObjectHideFlags: 0
@@ -5511,6 +5514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 1316359538}
+  Winner: {fileID: 1347548587}
 --- !u!1 &1318541351
 GameObject:
   m_ObjectHideFlags: 0

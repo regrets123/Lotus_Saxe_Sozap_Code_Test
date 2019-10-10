@@ -14,7 +14,7 @@ public class RoundsManager : MonoBehaviour
     [SerializeField]
     private FillBar[] _fillBars;
     private int _roundsCount;
-    private int _winner = 0;
+    private float highestScore;
     public GameObject textAnimator;
 
     void Start()
@@ -28,6 +28,7 @@ public class RoundsManager : MonoBehaviour
     {    //Triggers from buttonclick at mainmenu. Activates countdown animations and coroutines. 
 
         _mainMenu.enabled = false;
+        _roundsResults.enabled = false;
         GameManager.Instance.gameState = GameManager.GameState.load;
         _counter.enabled = true;
         if(_roundsCount == 1)
@@ -37,7 +38,6 @@ public class RoundsManager : MonoBehaviour
         else
         {   //updates countdown text and removes old tails
             textAnimator.GetComponent<Text>().text = ("Round " + _roundsCount);
-            ClearGameField();
 
         }
         textAnimator.GetComponent<Animator>().SetTrigger("Start");
@@ -46,30 +46,25 @@ public class RoundsManager : MonoBehaviour
         {
             Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
             if (_roundsCount > 1)
-            { temp.ResetPlayer(true); } 
+            { temp.ResetPlayer(true); }           
+            else
+            { temp.ResetPlayer(false); }
             temp.ToggleHud(true);
         }
         yield return new WaitForSeconds(5.5f);
-        StartGame();
+        StartGame();    
     }
 
     public void StartGame()
     {   //Changes gamestate to running for the player movement methods to start tracking and updating positions. 
 
-        bool resetScore;
-        if (_roundsCount == 1)
-        { resetScore = true; }
-        else
-        { resetScore = false; }
-
-        _counter.enabled = false;
-        _roundsResults.enabled = false;
+        GameManager.Instance.gameState = GameManager.GameState.running;
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++) //Ressurect all players from previous rounds, and reset score and positions.
         {
             Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
-            temp.ResetPlayer(resetScore);
+            temp.gameObject.GetComponent<TrailHandler>().StartSpawning();
         }
-        GameManager.Instance.gameState = GameManager.GameState.running;
+
 
     }
 
@@ -88,7 +83,9 @@ public class RoundsManager : MonoBehaviour
             transform.GetChild(0).GetChild(0).GetChild(i).gameObject.SetActive(true);
         }
         var sortedList = tempList.OrderByDescending(x => x.GetComponent<Player>().NewScore).ToList();
-        
+        highestScore = sortedList[0].GetComponent<Player>().NewScore;
+
+
         for (int i = 0; i < sortedList.Count; i++)
         {
              ScoreBoardUpdate(i, sortedList[i].GetComponent<Player>());
@@ -138,17 +135,33 @@ public class RoundsManager : MonoBehaviour
 
     public void NextRound()
     {   //triggers on next round button when u finished at scoreboard
-        StartCoroutine(StartCountdown());
+        if(highestScore > 149.9)
+        {
+            BacktoMain();
+        }
+        else
+        {
+            GameManager.Instance.cleaner.EraseTrails();
+            StartCoroutine(StartCountdown());
+        }
+
     }
 
-    private void ClearGameField()
-    {
-        //Remove all old tails
+    private void BacktoMain()
+    {   //resets all gamevariables to default.
 
-    }
+        GameManager.Instance.gameState = GameManager.GameState.mainMenu;
+        _roundsResults.enabled = false;
+        _mainMenu.enabled = true;
+        GameManager.Instance.cleaner.EraseTrails();
+        for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
+        {
+            _fillBars[i].Winner.SetActive(false);
+            Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
+            temp.ResetPlayer(false);
+            temp.ToggleHud(false);
 
-    public void ReturnToMain()
-    {
-        _winner = 0;
+        }
+
     }
 }
