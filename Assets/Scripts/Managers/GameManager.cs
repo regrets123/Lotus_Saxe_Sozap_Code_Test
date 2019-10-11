@@ -71,9 +71,9 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < ActivePlayers; i++)
         {
-            if(playerObjects[i].activeSelf) //if only one player is alive
+            if(playerObjects[i].GetComponent<Player>().Alive) //if only one player is alive
             {
-                i++;
+                remainingPlayers++;
             }            
         }
         if (remainingPlayers < 2 )
@@ -94,10 +94,6 @@ public class GameManager : MonoBehaviour
 
     public void AddPlayer(GameObject player, int playerNumber)
     {
-        if(playerObjects.Length <1)
-        {
-            playerObjects = new GameObject[4];
-        }
         playerObjects[playerNumber] = player;
     }
 }

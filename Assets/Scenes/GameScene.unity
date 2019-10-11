@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 35608897}
   m_Layer: 0
   m_Name: WallColliders
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 229257208}
   m_Layer: 8
   m_Name: BottomWall
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -506,7 +506,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 229257206}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -5.4, z: 0}
+  m_LocalPosition: {x: 0, y: -8.81, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 35608897}
@@ -536,7 +536,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18, y: 1}
+  m_Size: {x: 18, y: 8}
   m_EdgeRadius: 0
 --- !u!1 &232207858
 GameObject:
@@ -848,7 +848,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 497154110}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6, y: -0.02, z: 0}
+  m_LocalPosition: {x: 0.7, y: -0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2000455716}
@@ -964,7 +964,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 523072049}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6, y: -0.02, z: 0}
+  m_LocalPosition: {x: 0.7, y: -0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1576527702}
@@ -1071,9 +1071,10 @@ GameObject:
   - component: {fileID: 674872604}
   - component: {fileID: 674872601}
   - component: {fileID: 674872600}
+  - component: {fileID: 674872605}
   m_Layer: 5
   m_Name: Player3
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1160,10 +1161,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
     type: 3}
-  _index: 2
   _startPos: {fileID: 2094379835}
   _projectileSpawn: {fileID: 523072050}
   _playerHud: {fileID: 748894854}
+  index: 2
 --- !u!114 &674872603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1197,6 +1198,18 @@ CircleCollider2D:
   m_Offset: {x: -0.04, y: -0.17}
   serializedVersion: 2
   m_Radius: 0.05
+--- !u!114 &674872605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674872597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8acdc742401a6e44acec4213e638b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &704977526
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,7 +1222,7 @@ GameObject:
   - component: {fileID: 704977528}
   m_Layer: 8
   m_Name: RightWall
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1222,7 +1235,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704977526}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.33, y: 0, z: 0}
+  m_LocalPosition: {x: 12.69, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 35608897}
@@ -1252,7 +1265,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 12}
+  m_Size: {x: 8, y: 25}
   m_EdgeRadius: 0
 --- !u!1 &718254600
 GameObject:
@@ -1769,9 +1782,10 @@ GameObject:
   - component: {fileID: 966033221}
   - component: {fileID: 966033220}
   - component: {fileID: 966033218}
+  - component: {fileID: 966033223}
   m_Layer: 5
   m_Name: Player1
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1805,10 +1819,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
     type: 3}
-  _index: 0
   _startPos: {fileID: 56547290}
   _projectileSpawn: {fileID: 497154111}
   _playerHud: {fileID: 82943252}
+  index: 0
 --- !u!50 &966033218
 Rigidbody2D:
   serializedVersion: 4
@@ -1895,6 +1909,18 @@ CircleCollider2D:
   m_Offset: {x: 0.11, y: -0.007}
   serializedVersion: 2
   m_Radius: 0.06
+--- !u!114 &966033223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966033215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8acdc742401a6e44acec4213e638b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1022327574
 GameObject:
   m_ObjectHideFlags: 0
@@ -2177,7 +2203,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1105655300}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6, y: -0.02, z: 0}
+  m_LocalPosition: {x: 0.7, y: -0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 232207859}
@@ -3000,7 +3026,7 @@ GameObject:
   - component: {fileID: 1522807827}
   m_Layer: 8
   m_Name: TopWall
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3013,7 +3039,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1522807825}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.4, z: 0}
+  m_LocalPosition: {x: 0, y: 8.81, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 35608897}
@@ -3043,7 +3069,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 18, y: 1}
+  m_Size: {x: 18, y: 8}
   m_EdgeRadius: 0
 --- !u!1 &1576527701
 GameObject:
@@ -3094,9 +3120,10 @@ GameObject:
   - component: {fileID: 1578583663}
   - component: {fileID: 1578583660}
   - component: {fileID: 1578583659}
+  - component: {fileID: 1578583664}
   m_Layer: 5
   m_Name: Player4
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3183,10 +3210,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
     type: 3}
-  _index: 3
   _startPos: {fileID: 1274693788}
   _projectileSpawn: {fileID: 1105655301}
   _playerHud: {fileID: 460487383}
+  index: 3
 --- !u!114 &1578583662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3220,6 +3247,18 @@ CircleCollider2D:
   m_Offset: {x: -0.04, y: -0.17}
   serializedVersion: 2
   m_Radius: 0.05
+--- !u!114 &1578583664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578583656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8acdc742401a6e44acec4213e638b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1653225366
 GameObject:
   m_ObjectHideFlags: 0
@@ -3232,7 +3271,7 @@ GameObject:
   - component: {fileID: 1653225368}
   m_Layer: 8
   m_Name: LeftWall
-  m_TagString: Untagged
+  m_TagString: Walls
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3245,7 +3284,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1653225366}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.33, y: 0, z: 0}
+  m_LocalPosition: {x: -12.69, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 35608897}
@@ -3275,7 +3314,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 12}
+  m_Size: {x: 8, y: 25}
   m_EdgeRadius: 0
 --- !u!1 &1658439108
 GameObject:
@@ -3301,7 +3340,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1658439108}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.6, y: -0.02, z: 0}
+  m_LocalPosition: {x: 0.7, y: -0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 464394738}
@@ -3657,9 +3696,10 @@ GameObject:
   - component: {fileID: 1884430742}
   - component: {fileID: 1884430740}
   - component: {fileID: 1884430743}
+  - component: {fileID: 1884430744}
   m_Layer: 5
   m_Name: Player2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3742,10 +3782,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
     type: 3}
-  _index: 1
   _startPos: {fileID: 413292848}
   _projectileSpawn: {fileID: 1658439109}
   _playerHud: {fileID: 800466126}
+  index: 1
 --- !u!58 &1884430742
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -3783,6 +3823,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1884430744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1884430736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8acdc742401a6e44acec4213e638b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1973368043
 GameObject:
   m_ObjectHideFlags: 0

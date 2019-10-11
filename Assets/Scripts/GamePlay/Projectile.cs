@@ -20,13 +20,13 @@ public class Projectile : MonoBehaviour
         transform.position += transform.right * Time.deltaTime * 6f;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {   //only give points if hitting player. then remove it.
         if (collision.gameObject.tag == "Player")
         {
-            owner.NewScore += 10;
-            owner._playerHud.GetChild(2).GetComponent<Text>().text = Convert.ToString(owner.NewScore);
+            owner.HitScore += 10;
+            owner._playerHud.GetChild(2).GetComponent<Text>().text = Convert.ToString(owner.HitScore);
         }
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

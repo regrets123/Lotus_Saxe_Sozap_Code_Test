@@ -8,10 +8,10 @@ public class TrailCollision : MonoBehaviour
 
     private EdgeCollider2D _collider2D;
     private List<Vector2> _pointHolder;
-    [SerializeField]
-    public TrailRenderer TrailRenderer { get; set; }
+    public TrailData TrailData { get; set; }
     public Transform StaticTrails { get; set; }
     public bool Expanding { get; set; }
+    public int playerIndex { get; set; }
 
     private void Awake()
     {
@@ -42,7 +42,7 @@ public class TrailCollision : MonoBehaviour
         }
     }
 
-    public void SplitPoint(Transform collidingPlayer)
+    public void SplitPoint(Transform collidingPlayer, Transform trailOwner)
     {   //we gonna find the closest collision point, find the closest position on the trailCollider, then split at that index.
 
         Vector2 compareMe = collidingPlayer.position;
@@ -62,7 +62,8 @@ public class TrailCollision : MonoBehaviour
         }
         Debug.Log("splitpoint is at index:" + splitPoint);
         SplitCollider(handler, splitPoint);
-
+        handler.NewAtColl();
+        trailOwner.GetComponent<TrailHandler>().NewAtColl();
     }
 
     private void SplitCollider(TrailHandler handler, int i)
@@ -117,14 +118,14 @@ public class TrailCollision : MonoBehaviour
 
         AnimationCurve trailWidth = new AnimationCurve();
         Keyframe firstKey = new Keyframe(firstAlphaKeyTime, 0, 0, 0);
-        Keyframe secondKey = new Keyframe(firstAlphaKeyTime + 0.001f, 0.16f, 0, 0);
-        Keyframe thirdKey = new Keyframe(secondAlphaKeyTime - 0.001f, 0.16f, 0, 0);
+        Keyframe secondKey = new Keyframe(firstAlphaKeyTime + 0.001f, 0.13f, 0, 0);
+        Keyframe thirdKey = new Keyframe(secondAlphaKeyTime - 0.001f, 0.13f, 0, 0);
         Keyframe fourthKey = new Keyframe(secondAlphaKeyTime, 0, 0, 0);
         trailWidth.AddKey(firstKey);
         trailWidth.AddKey(secondKey);
         trailWidth.AddKey(thirdKey);
         trailWidth.AddKey(fourthKey);
-        TrailRenderer.widthCurve = trailWidth;
+        TrailData.Handler.Renderer.widthCurve = trailWidth;
 
     }
 
@@ -135,7 +136,7 @@ public class TrailCollision : MonoBehaviour
         AnimationCurve trailWidth = new AnimationCurve();
         if (atStart)
         {
-            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
+            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.13f, 0, 0);
             Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
             Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
             Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
@@ -143,11 +144,11 @@ public class TrailCollision : MonoBehaviour
             trailWidth.AddKey(secondKey);
             trailWidth.AddKey(thirdKey);
             trailWidth.AddKey(fourthKey);
-            TrailRenderer.widthCurve = trailWidth;
+            TrailData.Handler.Renderer.widthCurve = trailWidth;
         }
         else
         {
-            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.16f, 0, 0);
+            Keyframe firstKey = new Keyframe(firstAlphaKeyTime - 0.01f, 0.13f, 0, 0);
             Keyframe secondKey = new Keyframe(firstAlphaKeyTime - 0.009f, 0, 0, 0);
             Keyframe thirdKey = new Keyframe(1, 0, 0, 0);
             Keyframe fourthKey = new Keyframe(1, 0, 0, 0);
@@ -155,7 +156,7 @@ public class TrailCollision : MonoBehaviour
             trailWidth.AddKey(secondKey);
             trailWidth.AddKey(thirdKey);
             trailWidth.AddKey(fourthKey);
-            TrailRenderer.widthCurve = trailWidth;
+            TrailData.Handler.Renderer.widthCurve = trailWidth;
         }
     }
 }

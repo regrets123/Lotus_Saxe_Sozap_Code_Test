@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1271083741}
   m_Layer: 0
   m_Name: TrailCollider
-  m_TagString: Tails
+  m_TagString: Trail
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,7 +46,7 @@ EdgeCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.08
+  m_EdgeRadius: 0.065
   m_Points: []
 --- !u!114 &1271083741
 MonoBehaviour:

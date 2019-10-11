@@ -15,7 +15,7 @@ public class FillBar : MonoBehaviour
     [SerializeField]
     public GameObject Winner;
 
-    public IEnumerator AnimateBar(float intervall, float currentFill)
+    public IEnumerator AnimateBar(float intervall, float currentFill,int playerIndex)
     {   //calls on itself with intervals until the bar is filled. This way we avoid having a constant check in update for bools if I used a Lerp method instead.
 
         if (currentFill > EndValue)
@@ -23,7 +23,7 @@ public class FillBar : MonoBehaviour
             if (EndValue > 149.9)
             {
                 Winner.SetActive(true);
-                GameManager.Instance.roundsManager.StartCeleb();
+                GameManager.Instance.roundsManager.StartCeleb(playerIndex);
                 yield return null;
             }
 
@@ -31,9 +31,9 @@ public class FillBar : MonoBehaviour
         else
         {
             yield return new WaitForSeconds(intervall);
-            currentFill += 0.2f;
+            currentFill += 0.4f;
             _image.fillAmount = currentFill / 150;
-            StartCoroutine(AnimateBar(time, currentFill));
+            StartCoroutine(AnimateBar(time, currentFill,playerIndex));
         }
     }
 }

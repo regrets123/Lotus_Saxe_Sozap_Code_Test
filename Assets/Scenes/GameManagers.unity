@@ -131,6 +131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 576934692}
   - component: {fileID: 576934693}
+  - component: {fileID: 576934694}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -164,8 +165,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23acec07a3ecef14d8e39197e3d31d65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObjects: []
+  playerObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   roundsManager: {fileID: 0}
+  cleaner: {fileID: 0}
   CheckWin: 0
   round: 0
   gameState: 0
+--- !u!114 &576934694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576934691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6e53562c06649d4a9dc0d7dcb7d9584, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

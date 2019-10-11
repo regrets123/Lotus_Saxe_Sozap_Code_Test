@@ -15,7 +15,7 @@ public class RoundsManager : MonoBehaviour
     private FillBar[] _fillBars;
     private int _roundsCount;
     private float highestScore;
-    public GameObject textAnimator;
+    public GameObject textAnimator, fireWorks;
 
     void Start()
     {
@@ -44,12 +44,15 @@ public class RoundsManager : MonoBehaviour
 
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
         {
-            Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
+            Player player = GameManager.Instance.playerObjects[i].GetComponent<Player>();
             if (_roundsCount > 1)
-            { temp.ResetPlayer(true); }           
+            { player.ResetPlayer(true); }           
             else
-            { temp.ResetPlayer(false); }
-            temp.ToggleHud(true);
+            { player.ResetPlayer(false); }
+            player.ToggleHud(true);
+            player._playerHud.GetChild(0).gameObject.SetActive(false);
+            player._playerHud.GetChild(1).gameObject.SetActive(false);
+
         }
         yield return new WaitForSeconds(5.5f);
         StartGame();    
@@ -61,8 +64,10 @@ public class RoundsManager : MonoBehaviour
         GameManager.Instance.gameState = GameManager.GameState.running;
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++) //Ressurect all players from previous rounds, and reset score and positions.
         {
-            Player temp = GameManager.Instance.playerObjects[i].GetComponent<Player>();
-            temp.gameObject.GetComponent<TrailHandler>().StartSpawning();
+            Player player = GameManager.Instance.playerObjects[i].GetComponent<Player>();
+            player._playerHud.GetChild(0).gameObject.SetActive(true);
+            player._playerHud.GetChild(1).gameObject.SetActive(true);
+            player.gameObject.GetComponent<TrailHandler>().StartSpawning();
         }
 
 
@@ -103,15 +108,15 @@ public class RoundsManager : MonoBehaviour
             {
                 Color faded = playerColor;
                 faded.a = 0.5f;
-                uiElement.GetChild(i).GetComponent<Image>().color = faded;
+                uiElement.GetChild(0).GetChild(i).GetComponent<Image>().color = faded;
             }
             else
             {
-                uiElement.GetChild(i).GetComponent<Image>().color = playerColor;
+                uiElement.GetChild(0).GetChild(i).GetComponent<Image>().color = playerColor;
             }
         }
-        uiElement.GetChild(2).GetComponent<Text>().text = playerData.PlayerName;
-        uiElement.GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.NewScore);
+        uiElement.GetChild(0).GetChild(2).GetComponent<Text>().text = playerData.PlayerName;
+        uiElement.GetChild(0).GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.NewScore);
 
         if(playerData.Score != playerData.NewScore)
         {   //if score has changed between the rounds, we trigger animation coroutine for that, using data from the Decending list into fillbar index.
@@ -124,13 +129,20 @@ public class RoundsManager : MonoBehaviour
     private IEnumerator FillDelay(int index)
     {
         yield return new WaitForSeconds(1f);
-        StartCoroutine(_fillBars[index].AnimateBar(0.1f, _fillBars[index].StartValue));
+        StartCoroutine(_fillBars[index].AnimateBar(0.1f, _fillBars[index].StartValue,index));
     }
 
-    public void StartCeleb()
+    public void StartCeleb(int playerIndex)
     {   //TODO Trigger animations of playerUiElement and fireworks etc.
-
+        Transform uiElement = transform.GetChild(0).GetChild(0).GetChild(playerIndex).GetChild(0);
+        uiElement.GetComponent<Animator>().SetTrigger("Winner");
+        uiElement.GetChild(4).gameObject.SetActive(true);
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = "Menu";
+        if(fireWorks.activeSelf == false)
+        {
+            fireWorks.SetActive(true);
+            //start particle effect!
+        }
     }
 
     public void NextRound()
@@ -138,6 +150,7 @@ public class RoundsManager : MonoBehaviour
         if(highestScore > 149.9)
         {
             BacktoMain();
+            _roundsCount = 1;
         }
         else
         {
@@ -153,6 +166,12 @@ public class RoundsManager : MonoBehaviour
         GameManager.Instance.gameState = GameManager.GameState.mainMenu;
         _roundsResults.enabled = false;
         _mainMenu.enabled = true;
+        fireWorks.SetActive(false);
+        for (int i = 0; i < _fillBars.Length; i++)
+        {   //fastest shortcut to the winner fields in ui.
+            _fillBars[i].transform.parent.GetChild(4).gameObject.SetActive(false);
+            _fillBars[i].transform.parent.GetComponent<Animator>().SetTrigger("Stop");
+        }
         GameManager.Instance.cleaner.EraseTrails();
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
         {
