@@ -22,9 +22,9 @@ public class InputHandler : MonoBehaviour
             if (Input.GetAxisRaw(ReturnVerticalInput(controllingPlayer.index)) != 0)
             {
                 if (Input.GetAxisRaw(ReturnVerticalInput(controllingPlayer.index)) > 0.01)
-                { if (controllingPlayer.AttackOnCooldown == false) StartCoroutine(controllingPlayer.Attack()); }
+                { if (controllingPlayer.AttackOnCooldown == false) controllingPlayer.coroutines.Add(StartCoroutine(controllingPlayer.Attack())); }
                 else
-                { if (controllingPlayer.PhaseOnCooldown == false) StartCoroutine(controllingPlayer.Invulnerability()); }
+                { if (controllingPlayer.PhaseOnCooldown == false) controllingPlayer.coroutines.Add(StartCoroutine(controllingPlayer.Invulnerability())); }
             };
         }
         else if (GameManager.Instance.gameState == GameManager.GameState.load)

@@ -12,5 +12,6 @@ public class NameInput : MonoBehaviour
     {   //Find the written text and update the playerName.
         string temp = GetComponent<InputField>().text;
         _playerName.text = temp;
+        RoundsManager.Instance.Deselect();
     }
 }

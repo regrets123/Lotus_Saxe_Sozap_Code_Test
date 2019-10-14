@@ -5,24 +5,21 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
-{
-    public string PlayerName { get; set; }
-    public float NewScore { get; set; }
-    public float Score { get; set; }
-    public bool Alive { get; set; }
-    public float HitScore { get; set; }
+{   //Handles all player logic and variables
+
     public Color TrailColor { get; set; }
-    [SerializeField]
-    private GameObject _projectilePrefab;
+    public string PlayerName { get; set; }
+    public bool Alive, AttackOnCooldown, PhaseOnCooldown;
+    public float NewScore, Score, HitScore;
+    public int index;
+    public List<Coroutine> coroutines;
 
     [SerializeField]
-    private Transform _startPos, _projectileSpawn;
-    public Transform _playerHud;
-    public int index;
-    public bool AttackOnCooldown { get; set; }
-    public bool PhaseOnCooldown { get; set; }
+    private Transform _startPos, _projectileSpawn, _projectilePrefab, _playerHud;
+    [SerializeField]
+    private Animator _animator;
     private InputHandler _inputHandler;
-    private CircleCollider2D[] colliderArray;
+    private CircleCollider2D[] _colliderArray;
 
 
     private void TrackHudPosition()
@@ -32,7 +29,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        colliderArray = GetComponents<CircleCollider2D>();
+        coroutines = new List<Coroutine>();
+        _animator = transform.GetChild(0).GetComponent<Animator>();
+        _colliderArray = GetComponents<CircleCollider2D>();
         GameManager.Instance.AddPlayer(gameObject, index);  // need centralized references to the players since they are in different scenes you cant just drag them in the inspector.
         AttackOnCooldown = false;
         PhaseOnCooldown = false;
@@ -41,7 +40,6 @@ public class Player : MonoBehaviour
         gameObject.GetComponent<TrailHandler>().AssignTrailColor(this);
         gameObject.GetComponent<TrailHandler>().player = this;
         if (index == 2 || index == 3) gameObject.SetActive(false); //start wont trigger if the object isnt active, another solution would be to spawn from prefabs.
-
     }
 
     private void Update()
@@ -51,7 +49,7 @@ public class Player : MonoBehaviour
     }
     private void LateUpdate()
     {
-        if(GameManager.Instance.gameState == GameManager.GameState.running && !Alive)
+        if (GameManager.Instance.gameState == GameManager.GameState.running && !Alive)
         {
             gameObject.SetActive(false);
         }
@@ -59,19 +57,17 @@ public class Player : MonoBehaviour
 
     public void ToggleHud(bool toggleState)
     {
-        if (toggleState)
-        { _playerHud.gameObject.SetActive(true); }
-        else
-        { _playerHud.gameObject.SetActive(false); }
+        _playerHud.gameObject.SetActive(toggleState);
+        _playerHud.gameObject.SetActive(toggleState);
     }
 
     public IEnumerator Attack()
     {   //since we can only shoot straight ahead, the aim is simply position + rotation. 
         if (!AttackOnCooldown)
-        { 
+        {
             _playerHud.GetChild(0).gameObject.SetActive(false);
             AttackOnCooldown = true;
-            GameObject currentBullet = Instantiate(_projectilePrefab, GameManager.Instance.cleaner.transform.GetChild(0));
+            GameObject currentBullet = Instantiate(_projectilePrefab.gameObject, GameManager.Instance.cleaner.transform.GetChild(0));
             currentBullet.transform.position = _projectileSpawn.position;
             currentBullet.transform.rotation = transform.rotation;
             currentBullet.GetComponent<Projectile>().Shoot(this);
@@ -86,13 +82,35 @@ public class Player : MonoBehaviour
     {
         for (int i = 0; i < 3; i++)
         {
-            colliderArray[i].enabled = false;
+            _colliderArray[i].enabled = false;
         }
-
         ToggleHud(false);
         Alive = false;
         GameManager.Instance.CheckWin = true;
+    }
 
+    public void StopPlayerCoroutines()
+    {   //seems they have to be stopped on the level of monobehaviour they started at, no matter where they are stored. (didnt work if we stopped coroutines at player.StopAllCoroutines)
+        _inputHandler.StopAllCoroutines();
+        coroutines.Clear();
+    }
+
+    public void OnProjectileHit()
+    {   //called on when a player hits another player with a Projectile.
+        HitScore += 10;
+        _playerHud.GetChild(2).GetComponent<Text>().text = Convert.ToString(HitScore);
+    }
+
+
+    public void ToggleAbilityHud(bool toggleState)
+    {
+        _playerHud.GetChild(0).gameObject.SetActive(toggleState);
+        _playerHud.GetChild(1).gameObject.SetActive(toggleState);
+    }
+
+    public void UpdatePlayerScore()
+    {
+        NewScore += HitScore +Score; 
     }
 
     public void ResetPlayer(bool keepScore)
@@ -102,27 +120,30 @@ public class Player : MonoBehaviour
         {
             Score = 0;
             NewScore = 0;
+            HitScore = 0;
         }
         else
-        { Score = NewScore + HitScore; }
-        gameObject.transform.position = _startPos.position;
-        gameObject.transform.rotation = _startPos.rotation;
+        { Score = NewScore; } 
+        transform.position = _startPos.position;
+        transform.rotation = _startPos.rotation;
         gameObject.SetActive(true);
         _playerHud.GetChild(2).GetComponent<Text>().text = "0";
         HitScore = 0;
+        NewScore = 0;
         Alive = true;
         AttackOnCooldown = false;
         PhaseOnCooldown = false;
         for (int i = 0; i < 3; i++)
         {
-            colliderArray[i].enabled = true;
+            _colliderArray[i].enabled = true;
         }
         if (transform.childCount > 1) //remove old trails on players to spawn new. 
         { Destroy(transform.GetChild(1).gameObject); }
     }
 
     public IEnumerator Invulnerability()
-    {   //turns of colliders of player so we cant be hit, 
+    {   //turns of colliders of player so we cant be hit and triggers visual animation.
+        _animator.SetTrigger("Invulnurability");
         PhaseOnCooldown = true;
         CircleCollider2D[] temp = GetComponents<CircleCollider2D>();
         for (int i = 0; i < temp.Length; i++)
@@ -153,22 +174,28 @@ public class Player : MonoBehaviour
 
         float xMoveSpeed = 3f;
         float rotationSpeed = 150f;
-        _inputHandler.ParseInput(xMoveSpeed,rotationSpeed,this);
+        _inputHandler.ParseInput(xMoveSpeed, rotationSpeed, this);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {  //check collision with walls and trails. 
 
-
-        if (collision.gameObject.tag == "Trail" || collision.gameObject.tag == "Walls")
+        if (collision.gameObject.tag == "Trail" && Alive == true || collision.gameObject.tag == "Walls" && Alive == true)
         {
-            Debug.Log(PlayerName + "Crashed with " + collision.gameObject.name);
             TrailHandler handler = TrailManager.Instance.activeTrails[index].Handler;
             handler.Renderer.emitting = false;
             if (collision.gameObject.tag == "Trail")
             {
                 TrailData tempdata = collision.gameObject.GetComponent<TrailCollision>().TrailData;
-                tempdata.Collider.SplitPoint(transform, tempdata.Handler.transform);
+                if(tempdata.beforeSplitTrail == null)
+                {
+                    tempdata.TrailCollider.SplitPoint(transform, tempdata.Handler.transform);
+                }
+                else
+                {
+                    tempdata.TrailCollider.SubSplit(tempdata.beforeSplitTrail,transform);
+                }
+
                 collision.gameObject.SetActive(false);
             }
             else

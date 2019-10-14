@@ -547,8 +547,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 232207859}
+  - component: {fileID: 232207860}
   m_Layer: 5
-  m_Name: Scale
+  m_Name: Animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -572,6 +573,25 @@ Transform:
   m_Father: {fileID: 1578583657}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &232207860
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232207858}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 206242239f4c49f4dafe0814cb52c948, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &413292847
 GameObject:
   m_ObjectHideFlags: 0
@@ -722,8 +742,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 464394738}
+  - component: {fileID: 464394739}
   m_Layer: 5
-  m_Name: Scale
+  m_Name: Animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -747,6 +768,25 @@ Transform:
   m_Father: {fileID: 1884430737}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &464394739
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464394737}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d2b9be249b916d546a7b0f5da2e65090, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &483750946
 GameObject:
   m_ObjectHideFlags: 0
@@ -1159,12 +1199,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fcfde98857e4da47a69baa02a709fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
-    type: 3}
+  Alive: 0
+  AttackOnCooldown: 0
+  PhaseOnCooldown: 0
+  NewScore: 0
+  Score: 0
+  HitScore: 0
+  index: 2
   _startPos: {fileID: 2094379835}
   _projectileSpawn: {fileID: 523072050}
+  _projectilePrefab: {fileID: 3065374475009386407, guid: 637d544a872854e42b918fdac6836982,
+    type: 3}
   _playerHud: {fileID: 748894854}
-  index: 2
+  _animator: {fileID: 0}
 --- !u!114 &674872603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1181,7 +1228,6 @@ MonoBehaviour:
     type: 3}
   collisionPrefab: {fileID: 5396916938617258728, guid: e61fd71f887cbe94c9ebfb8fdaba27ad,
     type: 3}
-  _trail: {fileID: 0}
 --- !u!58 &674872604
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1291,7 +1337,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718254600}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1201975569}
@@ -1817,12 +1863,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fcfde98857e4da47a69baa02a709fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
-    type: 3}
+  Alive: 0
+  AttackOnCooldown: 0
+  PhaseOnCooldown: 0
+  NewScore: 0
+  Score: 0
+  HitScore: 0
+  index: 0
   _startPos: {fileID: 56547290}
   _projectileSpawn: {fileID: 497154111}
+  _projectilePrefab: {fileID: 3065374475009386407, guid: 637d544a872854e42b918fdac6836982,
+    type: 3}
   _playerHud: {fileID: 82943252}
-  index: 0
+  _animator: {fileID: 0}
 --- !u!50 &966033218
 Rigidbody2D:
   serializedVersion: 4
@@ -1860,7 +1913,6 @@ MonoBehaviour:
     type: 3}
   collisionPrefab: {fileID: 5396916938617258728, guid: e61fd71f887cbe94c9ebfb8fdaba27ad,
     type: 3}
-  _trail: {fileID: 0}
 --- !u!58 &966033220
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -3080,8 +3132,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1576527702}
+  - component: {fileID: 1576527703}
   m_Layer: 5
-  m_Name: Scale
+  m_Name: Animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3105,6 +3158,25 @@ Transform:
   m_Father: {fileID: 674872598}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1576527703
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576527701}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 68eb337e14c92ec43874f931530991a8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1578583656
 GameObject:
   m_ObjectHideFlags: 0
@@ -3208,12 +3280,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fcfde98857e4da47a69baa02a709fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
-    type: 3}
+  Alive: 0
+  AttackOnCooldown: 0
+  PhaseOnCooldown: 0
+  NewScore: 0
+  Score: 0
+  HitScore: 0
+  index: 3
   _startPos: {fileID: 1274693788}
   _projectileSpawn: {fileID: 1105655301}
+  _projectilePrefab: {fileID: 3065374475009386407, guid: 637d544a872854e42b918fdac6836982,
+    type: 3}
   _playerHud: {fileID: 460487383}
-  index: 3
+  _animator: {fileID: 0}
 --- !u!114 &1578583662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3230,7 +3309,6 @@ MonoBehaviour:
     type: 3}
   collisionPrefab: {fileID: 5396916938617258728, guid: e61fd71f887cbe94c9ebfb8fdaba27ad,
     type: 3}
-  _trail: {fileID: 0}
 --- !u!58 &1578583663
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -3751,7 +3829,6 @@ MonoBehaviour:
     type: 3}
   collisionPrefab: {fileID: 5396916938617258728, guid: e61fd71f887cbe94c9ebfb8fdaba27ad,
     type: 3}
-  _trail: {fileID: 0}
 --- !u!58 &1884430740
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -3780,12 +3857,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fcfde98857e4da47a69baa02a709fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectilePrefab: {fileID: 3065374475009386405, guid: 637d544a872854e42b918fdac6836982,
-    type: 3}
+  Alive: 0
+  AttackOnCooldown: 0
+  PhaseOnCooldown: 0
+  NewScore: 0
+  Score: 0
+  HitScore: 0
+  index: 1
   _startPos: {fileID: 413292848}
   _projectileSpawn: {fileID: 1658439109}
+  _projectilePrefab: {fileID: 3065374475009386407, guid: 637d544a872854e42b918fdac6836982,
+    type: 3}
   _playerHud: {fileID: 800466126}
-  index: 1
+  _animator: {fileID: 0}
 --- !u!58 &1884430742
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -3883,8 +3967,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2000455716}
+  - component: {fileID: 2000455717}
   m_Layer: 5
-  m_Name: Scale
+  m_Name: Animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3908,6 +3993,25 @@ Transform:
   m_Father: {fileID: 966033216}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &2000455717
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000455715}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b2964c159af3ee04bbea8de582176a41, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &2061220058
 GameObject:
   m_ObjectHideFlags: 0

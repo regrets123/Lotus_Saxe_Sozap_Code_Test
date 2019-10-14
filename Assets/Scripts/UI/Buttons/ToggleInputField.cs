@@ -5,9 +5,7 @@ using UnityEngine;
 public class ToggleInputField : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _inputField;
-    [SerializeField]
-    private GameObject _placeHolder;
+    private GameObject _inputField, _placeHolder;
 
     public void Toggle()
     { //if off turn on, and vice versa. 
@@ -21,6 +19,5 @@ public class ToggleInputField : MonoBehaviour
             _inputField.SetActive(true);
             _placeHolder.SetActive(false);
         }
-
     }
 }

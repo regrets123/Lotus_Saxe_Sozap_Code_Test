@@ -4,25 +4,26 @@ using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class RoundsManager : MonoBehaviour
+public class RoundsManager : Singelton<RoundsManager>
 {   //Handles UI, logic between each round and triggers animations.
 
-
+    public GameObject textAnimator, fireWorks;
     [SerializeField]
     private Canvas _roundsResults, _mainMenu, _counter;
     [SerializeField]
     private FillBar[] _fillBars;
+    [SerializeField]
+    private EventSystem _eventSystem;
     private int _roundsCount;
-    private float highestScore;
-    public GameObject textAnimator, fireWorks;
+    private float _highestScore;
+
 
     void Start()
     {
-        GameManager.Instance.roundsManager = this;
         _roundsCount = 1;
     }
-
 
     public IEnumerator StartCountdown()
     {    //Triggers from buttonclick at mainmenu. Activates countdown animations and coroutines. 
@@ -50,8 +51,7 @@ public class RoundsManager : MonoBehaviour
             else
             { player.ResetPlayer(false); }
             player.ToggleHud(true);
-            player._playerHud.GetChild(0).gameObject.SetActive(false);
-            player._playerHud.GetChild(1).gameObject.SetActive(false);
+            player.ToggleAbilityHud(false);
 
         }
         yield return new WaitForSeconds(5.5f);
@@ -65,16 +65,18 @@ public class RoundsManager : MonoBehaviour
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++) //Ressurect all players from previous rounds, and reset score and positions.
         {
             Player player = GameManager.Instance.playerObjects[i].GetComponent<Player>();
-            player._playerHud.GetChild(0).gameObject.SetActive(true);
-            player._playerHud.GetChild(1).gameObject.SetActive(true);
+            player.ToggleAbilityHud(true);
             player.gameObject.GetComponent<TrailHandler>().StartSpawning();
         }
+    }
 
-
+    public void Deselect()
+    {   //Eventsystem saves last interacted UI element, so if u press space or enter it triggers it again, no matter if canvas is active.
+        _eventSystem.SetSelectedGameObject(null);
     }
 
     public void PostRound()
-    {   //Sorts ranking and keeps track of which round we at, resets playerstates.
+    {   //Sorts ranking and keeps track of which round we at, resets playerstates, and stops all trail routines.
 
         _roundsCount++;
         _roundsResults.enabled = true;       
@@ -84,11 +86,15 @@ public class RoundsManager : MonoBehaviour
         for (int i = 0; i < GameManager.Instance.ActivePlayers; i++)
         {
             GameObject player = GameManager.Instance.playerObjects[i];
+            player.GetComponent<TrailHandler>().StopAllCoroutines();
+            Player playerScript = player.GetComponent<Player>();
+            playerScript.StopPlayerCoroutines();
+            playerScript.UpdatePlayerScore();
             tempList.Add(player);
             transform.GetChild(0).GetChild(0).GetChild(i).gameObject.SetActive(true);
         }
         var sortedList = tempList.OrderByDescending(x => x.GetComponent<Player>().NewScore).ToList();
-        highestScore = sortedList[0].GetComponent<Player>().NewScore;
+        _highestScore = sortedList[0].GetComponent<Player>().NewScore;
 
 
         for (int i = 0; i < sortedList.Count; i++)
@@ -111,43 +117,42 @@ public class RoundsManager : MonoBehaviour
                 uiElement.GetChild(0).GetChild(i).GetComponent<Image>().color = faded;
             }
             else
-            {
-                uiElement.GetChild(0).GetChild(i).GetComponent<Image>().color = playerColor;
-            }
+            { uiElement.GetChild(0).GetChild(i).GetComponent<Image>().color = playerColor; }
         }
+        _fillBars[index].SetFill(playerData.Score);
         uiElement.GetChild(0).GetChild(2).GetComponent<Text>().text = playerData.PlayerName;
-        uiElement.GetChild(0).GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.NewScore);
+        uiElement.GetChild(0).GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.Score);
 
-        if(playerData.Score != playerData.NewScore)
-        {   //if score has changed between the rounds, we trigger animation coroutine for that, using data from the Decending list into fillbar index.
+        if (playerData.Score != playerData.NewScore)
+        {   //Then animate the gain for the new scores.
             _fillBars[index].StartValue = playerData.Score;
             _fillBars[index].EndValue = playerData.NewScore;
             StartCoroutine(FillDelay(index));
+            uiElement.GetChild(0).GetChild(3).GetComponent<Text>().text = Convert.ToString(playerData.NewScore);
         }
     }
 
     private IEnumerator FillDelay(int index)
     {
         yield return new WaitForSeconds(1f);
-        StartCoroutine(_fillBars[index].AnimateBar(0.1f, _fillBars[index].StartValue,index));
+        StartCoroutine(_fillBars[index].AnimateBar(0.01f, _fillBars[index].StartValue,index));
     }
 
-    public void StartCeleb(int playerIndex)
-    {   //TODO Trigger animations of playerUiElement and fireworks etc.
+    public void StartCelebration(int playerIndex)
+    {   // Trigger animations of playerUiElement and fireworks etc.
         Transform uiElement = transform.GetChild(0).GetChild(0).GetChild(playerIndex).GetChild(0);
         uiElement.GetComponent<Animator>().SetTrigger("Winner");
         uiElement.GetChild(4).gameObject.SetActive(true);
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = "Menu";
         if(fireWorks.activeSelf == false)
         {
-            fireWorks.SetActive(true);
-            //start particle effect!
+            fireWorks.SetActive(true);  //start particle effect!
         }
     }
 
     public void NextRound()
     {   //triggers on next round button when u finished at scoreboard
-        if(highestScore > 149.9)
+        if(_highestScore > 149.9)
         {
             BacktoMain();
             _roundsCount = 1;
@@ -157,7 +162,7 @@ public class RoundsManager : MonoBehaviour
             GameManager.Instance.cleaner.EraseTrails();
             StartCoroutine(StartCountdown());
         }
-
+        Deselect();
     }
 
     private void BacktoMain()
@@ -181,6 +186,5 @@ public class RoundsManager : MonoBehaviour
             temp.ToggleHud(false);
 
         }
-
     }
 }

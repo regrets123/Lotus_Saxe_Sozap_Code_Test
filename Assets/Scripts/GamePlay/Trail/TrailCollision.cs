@@ -6,12 +6,12 @@ using System;
 public class TrailCollision : MonoBehaviour
 {   //Handles collision point updates of the trail and splitting points.
 
-    private EdgeCollider2D _collider2D;
-    private List<Vector2> _pointHolder;
     public TrailData TrailData { get; set; }
     public Transform StaticTrails { get; set; }
     public bool Expanding { get; set; }
     public int playerIndex { get; set; }
+    public EdgeCollider2D collider2D;
+    private List<Vector2> _pointHolder;
 
     private void Awake()
     {
@@ -20,7 +20,7 @@ public class TrailCollision : MonoBehaviour
 
     void Start()
     {
-        _collider2D = GetComponent<EdgeCollider2D>();
+        collider2D = GetComponent<EdgeCollider2D>();
         _pointHolder = new List<Vector2>();
     }
 
@@ -37,7 +37,7 @@ public class TrailCollision : MonoBehaviour
                     Vector2 temp = _pointHolder[i];
                     newPoints[i] = _pointHolder[i];
                 }
-                _collider2D.points = newPoints;
+                collider2D.points = newPoints;
             }
         }
     }
@@ -45,67 +45,119 @@ public class TrailCollision : MonoBehaviour
     public void SplitPoint(Transform collidingPlayer, Transform trailOwner)
     {   //we gonna find the closest collision point, find the closest position on the trailCollider, then split at that index.
 
-        Vector2 compareMe = collidingPlayer.position;
-        Vector2 breakPoint = _collider2D.ClosestPoint(compareMe);
-        TrailHandler handler = collidingPlayer.GetComponent<TrailHandler>();
-        float distance = Mathf.Infinity;
-        int splitPoint = 999;
+        int breakIndex = FindBreakPoint(collidingPlayer.position, collider2D);
+        TrailHandler originalTrail = trailOwner.GetComponent<TrailHandler>();
 
-        for (int i = 0; i < _collider2D.points.Length; i++)
+        SplitCollider(originalTrail, breakIndex);
+
+        if (transform.parent.name != "StaticTrails")
         {
-            float tempdistance = Vector2.Distance(_collider2D.points[i], breakPoint);
+            originalTrail.NewAtColl();
+        }
+        collidingPlayer.GetComponent<TrailHandler>().NewAtColl();
+
+    }
+
+    public void SubSplit(TrailData originalData, Transform playerPosition)
+    {   //if trail was lrdy split, second split simply removes the collider and the visual presentation of that part of the trail. 
+
+        Vector2 vector2 = playerPosition.position;
+        int index = FindBreakPoint(vector2, originalData.TrailCollider.collider2D);
+        if (index > originalData.TrailCollider.collider2D.pointCount/2)
+        {   //finds the corresponding keypoint to delete to "remove" the visual part of the trail
+            float SmallTime = Mathf.Infinity;
+            int smallIndex = 999;
+            for (int i = 0; i < 4; i++)
+            {
+                if (TrailData.VisualTrail.widthCurve[i].time < SmallTime)
+                {
+                    SmallTime = TrailData.VisualTrail.widthCurve[i].time;
+                    smallIndex = i;
+                }
+            }
+            AnimationCurve temp = TrailData.VisualTrail.widthCurve;
+            temp.RemoveKey(smallIndex);
+            originalData.VisualTrail.widthCurve = temp;
+        }
+        else
+        {
+            //finds the corresponding keypoint to delete to "remove" the visual part of the trail
+            float bigTime = 0;
+            int bigIndex = 999;
+            for (int i = 0; i < 4; i++)
+            {
+                if (TrailData.VisualTrail.widthCurve[i].time > bigTime)
+                {
+                    bigTime = TrailData.VisualTrail.widthCurve[i].time;
+                    bigIndex = i;
+                }
+            }
+            AnimationCurve temp = TrailData.VisualTrail.widthCurve;
+            temp.RemoveKey(bigIndex);
+            originalData.VisualTrail.widthCurve = temp;
+
+        }
+        gameObject.SetActive(false);
+    }
+
+    private int FindBreakPoint(Vector2 playerPosition, EdgeCollider2D collider)
+    {
+        int splitPoint = 999;
+        float distance = Mathf.Infinity;
+        Vector2 breakPoint = collider.ClosestPoint(playerPosition);
+        for (int i = 0; i < collider.points.Length; i++)
+        {
+            float tempdistance = Vector2.Distance(collider.points[i], breakPoint);
             if (tempdistance < distance)
             {
                 distance = tempdistance;
                 splitPoint = (i);
             }
         }
-        Debug.Log("splitpoint is at index:" + splitPoint);
-        SplitCollider(handler, splitPoint);
-        handler.NewAtColl();
-        trailOwner.GetComponent<TrailHandler>().NewAtColl();
+        Debug.Log("Found breakpoint " + splitPoint + " out of " + collider.pointCount);
+        return splitPoint;
     }
 
-    private void SplitCollider(TrailHandler handler, int i)
+    private void SplitCollider(TrailHandler originalTrailHandler, int i)
     {   //for the hole to be symetrical we need an uneven array and remove equal amount of index at both sides of collision.
 
         if (i < 6) //if we collide with the first x.
         {
-            Vector2[] firstNewCollider = new Vector2[_collider2D.points.Length - (i + 5)]; //if its the first node we just make the new list one index shorter and offset with x.
+            Vector2[] firstNewCollider = new Vector2[collider2D.points.Length - (i + 5)]; //if its the first node we just make the new list one index shorter and offset with x.
             for (int j = 0; j < firstNewCollider.Length; j++)
             {
-                firstNewCollider[j] = _collider2D.points[j + 5 + i];
+                firstNewCollider[j] = collider2D.points[j + 5 + i];
             }
-            handler.NewTrailFromArr(firstNewCollider);
-            SplitGardientTrail(firstNewCollider.Length, _collider2D.points.Length, true); 
+            originalTrailHandler.NewTrailFromArr(firstNewCollider, originalTrailHandler.trailData);
+            SplitGardientTrail(firstNewCollider.Length, collider2D.points.Length, true); 
             return;
         }
-        else if (i > _collider2D.points.Length - 6) //if we colide with the last x
+        else if (i > collider2D.points.Length - 6) //if we colide with the last x
         {
-            Vector2[] firstNewCollider = new Vector2[_collider2D.points.Length - (_collider2D.points.Length-(i-5))]; // if its the last one we copy all but last aka, x.
+            Vector2[] firstNewCollider = new Vector2[collider2D.points.Length - (collider2D.points.Length-(i-5))]; // if its the last one we copy all but last aka, x.
             for (int j = 0; j < firstNewCollider.Length; j++)
             {
-                firstNewCollider[j] = _collider2D.points[j];
+                firstNewCollider[j] = collider2D.points[j];
             }
-            handler.NewTrailFromArr(firstNewCollider);
-            SplitGardientTrail(firstNewCollider.Length, _collider2D.points.Length,false);
+            originalTrailHandler.NewTrailFromArr(firstNewCollider, originalTrailHandler.trailData);
+            SplitGardientTrail(firstNewCollider.Length, collider2D.points.Length,false);
             return;
         }
         else
         {   //if its somewhere else we cut it at the point of collision, skipping x.
             Vector2[] firstNewCollider = new Vector2[i - 5];
-            Vector2[] secondNewCollider = new Vector2[_collider2D.points.Length - (i + 5)];
+            Vector2[] secondNewCollider = new Vector2[collider2D.points.Length - (i + 5)];
             for (int j = 0; j < firstNewCollider.Length; j++)
             {
-                firstNewCollider[j] = _collider2D.points[j];
+                firstNewCollider[j] = collider2D.points[j];
             }
             for (int k = 0; k < secondNewCollider.Length; k++)
             {
-                secondNewCollider[k] = _collider2D.points[i + k + 5];
+                secondNewCollider[k] = collider2D.points[i + k + 5];
             }
-            handler.NewTrailFromArr(firstNewCollider);
-            handler.NewTrailFromArr(secondNewCollider);
-            SplitGardientTrail(firstNewCollider.Length, _collider2D.points.Length - secondNewCollider.Length, _collider2D.points.Length);
+            originalTrailHandler.NewTrailFromArr(firstNewCollider, originalTrailHandler.trailData);
+            originalTrailHandler.NewTrailFromArr(secondNewCollider, originalTrailHandler.trailData);
+            SplitGardientTrail(firstNewCollider.Length, collider2D.points.Length - secondNewCollider.Length, collider2D.points.Length);
             return;
         }
     }
@@ -126,7 +178,6 @@ public class TrailCollision : MonoBehaviour
         trailWidth.AddKey(thirdKey);
         trailWidth.AddKey(fourthKey);
         TrailData.Handler.Renderer.widthCurve = trailWidth;
-
     }
 
     private void SplitGardientTrail(float firstIndex, float fullTrail, bool atStart)
